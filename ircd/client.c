@@ -5,7 +5,7 @@
  *  Copyright (C) 1990 Jarkko Oikarinen and University of Oulu, Co Center
  *  Copyright (C) 1996-2002 Hybrid Development Team
  *  Copyright (C) 2002-2005 ircd-ratbox development team
- *  Copyright (C) 2007 William Pitcock
+ *  Copyright (C) 2007 Ariadne Conill <ariadne@dereferenced.org>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -307,11 +307,6 @@ free_local_client(struct Client *client_p)
 
 	rb_free(client_p->localClient->cipher_string);
 
-	if (IsCapable(client_p, CAP_ZIP))
-		ssld_decrement_clicount(client_p->localClient->z_ctl);
-
-	rb_free(client_p->localClient->zipstats);
-
 	if (client_p->localClient->ws_ctl != NULL)
 		wsockd_decrement_clicount(client_p->localClient->ws_ctl);
 
@@ -556,7 +551,7 @@ check_klines(void)
 			}
 
 			sendto_realops_snomask(SNO_GENERAL, L_NETWIDE,
-					     "KLINE active for %s (%s@%s)",
+					     "Disconnecting K-Lined user %s (%s@%s)",
 					     get_client_name(client_p, HIDE_IP), aconf->user, aconf->host);
 
 			notify_banned_client(client_p, aconf, K_LINED);
@@ -639,7 +634,7 @@ check_one_kline(struct ConfItem *kline)
 		}
 
 		sendto_realops_snomask(SNO_GENERAL, L_NETWIDE,
-					 "KLINE active for %s (%s@%s)",
+					 "Disconnecting K-Lined user %s (%s@%s)",
 					 get_client_name(client_p, HIDE_IP), kline->user, kline->host);
 
 		notify_banned_client(client_p, kline, K_LINED);
@@ -674,7 +669,7 @@ check_dlines(void)
 				continue;
 
 			sendto_realops_snomask(SNO_GENERAL, L_NETWIDE,
-					     "DLINE active for %s (%s)",
+					     "Disconnecting D-Lined user %s (%s)",
 					     get_client_name(client_p, HIDE_IP), aconf->host);
 
 			notify_banned_client(client_p, aconf, D_LINED);
@@ -730,7 +725,7 @@ check_xlines(void)
 			}
 
 			sendto_realops_snomask(SNO_GENERAL, L_NETWIDE,
-						"XLINE active for %s (%s)",
+						"Disconnecting X-Lined user %s (%s)",
 						get_client_name(client_p, HIDE_IP), aconf->host);
 
 			(void) exit_client(client_p, client_p, &me, "Bad user info");

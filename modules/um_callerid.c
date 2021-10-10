@@ -96,10 +96,12 @@ allow_message(struct Client *source_p, struct Client *target_p)
 	if (!IsSetAnyCallerID(target_p))
 		return true;
 
-	if (IsSetRelaxedCallerID(target_p) && has_common_channel(source_p, target_p) && !IsSetStrictCallerID(target_p))
+	if (!IsPerson(source_p))
 		return true;
 
-	if (IsServer(source_p))
+	if (IsSetRelaxedCallerID(target_p) &&
+			!IsSetStrictCallerID(target_p) &&
+			has_common_channel(source_p, target_p))
 		return true;
 
 	/* always allow services through */
@@ -107,7 +109,7 @@ allow_message(struct Client *source_p, struct Client *target_p)
 		return true;
 
 	/* XXX: controversial?  allow opers to send through +g */
-	if (HasPrivilege(source_p, "oper:message"))
+	if (MayHavePrivilege(source_p, "oper:message"))
 		return true;
 
 	if (accept_message(source_p, target_p))
